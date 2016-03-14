@@ -18,23 +18,23 @@ data DecodedMultihash = DecodedMultihash {
 
 type Multihash = B.ByteString
 
--- Encode 
--- arguments are fn, hash type 
--- return the multihash with code, length, and the digest
 encode :: B.ByteString -> String -> Multihash 
 encode b h = B.append hash_info b where 
 	hash_info = B.pack [(get_hash_code h),(fromIntegral $ B.length b)]
 
-decode :: Multihash -> DecodedMultihash 
-decode = undefined
---decode b = do b_code <- 
+decode :: Multihash -> Maybe DecodedMultihash 
+decode b = case parseOnly parse_multihash b of 
+	Left _-> Nothing 
+	Right a -> Just dmh where
+		dmh = a {h_length = digest_length} where
+		digest_length = B.length $ digest a 
 
 
 parse_multihash :: Parser DecodedMultihash
-parse_multihash = do b_code <- fromIntegral $ A.take 1 
-                     b_name <- (get_hash_string b_code)
+parse_multihash = do b_code <- A.anyWord8 
+                     A.take 1 
                      b_digest <- A.takeByteString
-                     return (DecodedMultihash {code=b_code, name=b_name, h_length=0, digest=b_digest})
+                     return (DecodedMultihash {code=(fromIntegral b_code), name=(get_hash_string b_code), h_length=0, digest=b_digest})
 
 
 get_hash_string :: Word8 -> String 
