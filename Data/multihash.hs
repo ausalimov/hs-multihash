@@ -39,12 +39,12 @@ parse_multihash = do b_code <- A.anyWord8
 
 get_hash_string :: Word8 -> String 
 get_hash_string c = case c of 
-	h_SHA1 -> "sha1"
-	h_SHA2_256 ->"sha2-256"
-	h_SHA2_512 ->"sha2-512"
-	h_SHA3  -> "sha3"
-	h_BLAKE2B -> "blake2b"
-	h_BLAKE2S -> "blake2s"
+	0x11 -> "sha1"
+	0x12 ->"sha2-256"
+	0x13 ->"sha2-512"
+	0x14 -> "sha3"
+	0x40 -> "blake2b"
+	0x41 -> "blake2s"
 
 get_hash_code :: String -> Word8
 get_hash_code s = case s of 
